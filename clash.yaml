@@ -3,7 +3,7 @@ proxy-providers:
   Sub:
     type: http
     # 单位秒
-    interval: 7200
+    interval: 18000
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -104,22 +104,21 @@ dns:
     - geosite:private
     - geosite:cn
   default-nameserver:
+    - 223.6.6.6
     - 223.5.5.5
     - 119.29.29.29
   proxy-server-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+    - "tls://dns.google"
+    - "https://dns.cloudflare.com/dns-query"
   nameserver:
     - 223.5.5.5
     - 119.29.29.29
   nameserver-policy:
-    "rule-set:private_domain,cn_domain":
+    "rule-set:private_domain,direct_list,cn_domain,cn_ip":
+    - 223.6.6.6
     - 223.5.5.5
     - 119.29.29.29
-    "rule-set:geolocation-!cn":
-      - "https://dns.cloudflare.com/dns-query"
-      - "https://dns.google/dns-query"
- 
+
    
 proxies:
 - name: "🟢 直连"
@@ -150,16 +149,18 @@ proxy-groups:
   - {name: 🇯🇵 日本节点, type: select, include-all: true, filter: "(?i)日|jp|japan"}
   - {name: 🇸🇬 新加坡节点, type: select, include-all: true, filter: "(?i)新|狮|獅|SG|Singapore"}
   - {name: 🇺🇲 美国节点, type: select, include-all: true, filter: "(?i)美|us|unitedstates|united states"}
-  - {name: ♻️ 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$"}
-  - {name: ♻️ 台湾自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美)).)*$"}
-  - {name: ♻️ 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$"}
-  - {name: ♻️ 新加坡自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(新|狮|狮|SG|Singapore))^((?!(港|日|韩|台|美)).)*$"}
-  - {name: ♻️ 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$"}
-  - {name: ♻️ 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^((?!(直连)).)*$"}
+  - {name: ♻️ 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$"}
+  - {name: ♻️ 台湾自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美)).)*$"}
+  - {name: ♻️ 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$"}
+  - {name: ♻️ 新加坡自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(新|狮|狮|SG|Singapore))^((?!(港|日|韩|台|美)).)*$"}
+  - {name: ♻️ 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$"}
+  - {name: ♻️ 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "^((?!(直连)).)*$"}
   - {name: 🌐 全部节点, type: select, include-all: true}
 rules:
   - RULE-SET,private_domain,🟢 直连
   - RULE-SET,direct_list,🟢 直连
+  - RULE-SET,cn_domain,🎯 全球直连
+  - RULE-SET,cn_ip,🎯 全球直连
   - RULE-SET,proxylite,🚀 节点选择
   - RULE-SET,apple_domain,🍎 Apple
   - RULE-SET,microsoft_domain,🪟 Microsoft
@@ -172,11 +173,10 @@ rules:
   - RULE-SET,google_domain,🍀 Google
   - RULE-SET,tiktok_domain,🎵 TikTok
   - RULE-SET,telegram_domain,📲 Telegram
+  - RULE-SET,gfw_domain,🚀 节点选择
   - RULE-SET,geolocation-!cn,🚀 节点选择
-  - RULE-SET,cn_domain,🎯 全球直连
   - RULE-SET,google_ip,🍀 Google,no-resolve
   - RULE-SET,telegram_ip,📲 Telegram,no-resolve
-  - RULE-SET,cn_ip,🎯 全球直连
   - MATCH,🐟 漏网之鱼
 rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
