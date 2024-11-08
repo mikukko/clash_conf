@@ -164,7 +164,7 @@ rules:
   - RULE-SET,apple_domain,🍎 Apple
   - RULE-SET,bing_domain,🏄️ Bing
   - RULE-SET,onedrive_domain,🐬 OneDrive
-  - RULE-SET,proxylite,🚀 节点选择
+
   - RULE-SET,ai,🤖 OpenAI
   - RULE-SET,github_domain,👨🏿‍💻 GitHub
   - RULE-SET,bahamut_domain,⛵️ 巴哈姆特
@@ -176,6 +176,7 @@ rules:
   - RULE-SET,google_ip,🍀 Google,no-resolve
   - RULE-SET,telegram_ip,📲 Telegram,no-resolve
   
+  - RULE-SET,proxylite,🚀 节点选择
   - RULE-SET,gfw_domain,🚀 节点选择
   - RULE-SET,geolocation-!cn,🚀 节点选择
   - MATCH,🐟 漏网之鱼
