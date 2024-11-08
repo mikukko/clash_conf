@@ -132,15 +132,15 @@ proxy-groups:
   - {name: 🚀 节点选择, type: select, proxies: [♻️ 香港自动, ♻️ 台湾自动, ♻️ 日本自动, ♻️ 新加坡自动, ♻️ 美国自动, ♻️ 自动选择, 🇭🇰 香港节点, 🇼🇸 台湾节点, 🇯🇵 日本节点, 🇸🇬 新加坡节点, 🇺🇲 美国节点, 🌐 全部节点, 🟢 直连]}
   - {name: 🎯 全球直连, type: select, proxies: [🟢 直连, 🚀 节点选择]}
   - {name: 🍎 Apple, type: select, proxies: [🟢 直连, 🚀 节点选择]}
-  - {name: 🪟 Microsoft,!!merge <<: *pr}
-  - {name: 🐬 OneDrive,!!merge <<: *pr}
-  - {name: 🤖 OpenAI, type: select, proxies: [♻️ 日本自动, ♻️ 新加坡自动, ♻️ 美国自动]}
+  - {name: 🏄️ Bing, type: select, proxies: [🟢 直连, 🚀 节点选择]}
   - {name: 👨🏿‍💻 GitHub,!!merge <<: *pr}
+  - {name: 🐬 OneDrive,!!merge <<: *pr}
+
+  - {name: 🤖 OpenAI, type: select, proxies: [♻️ 日本自动, ♻️ 新加坡自动, ♻️ 美国自动]}
   - {name: ⛵️ 巴哈姆特, type: select, proxies: [♻️ 台湾自动]}
   - {name: 🎼 Spotify,!!merge <<: *pr}
   - {name: 📹 YouTube,!!merge <<: *pr}
   - {name: 🍀 Google,!!merge <<: *pr}
-  - {name: 🎵 TikTok,!!merge <<: *pr}
   - {name: 📲 Telegram,!!merge <<: *pr}
   - {name: 🐟 漏网之鱼,!!merge <<: *pr}
 
@@ -161,17 +161,16 @@ rules:
   - RULE-SET,direct_list,🟢 直连
   - RULE-SET,cn_domain,🎯 全球直连
   - RULE-SET,cn_ip,🎯 全球直连
-  - RULE-SET,proxylite,🚀 节点选择
   - RULE-SET,apple_domain,🍎 Apple
-  - RULE-SET,microsoft_domain,🪟 Microsoft
+  - RULE-SET,bing_domain,🏄️ Bing
   - RULE-SET,onedrive_domain,🐬 OneDrive
+  - RULE-SET,proxylite,🚀 节点选择
   - RULE-SET,ai,🤖 OpenAI
   - RULE-SET,github_domain,👨🏿‍💻 GitHub
   - RULE-SET,bahamut_domain,⛵️ 巴哈姆特
   - RULE-SET,spotify_domain,🎼 Spotify
   - RULE-SET,youtube_domain,📹 YouTube
   - RULE-SET,google_domain,🍀 Google
-  - RULE-SET,tiktok_domain,🎵 TikTok
   - RULE-SET,telegram_domain,📲 Telegram
   - RULE-SET,gfw_domain,🚀 节点选择
   - RULE-SET,geolocation-!cn,🚀 节点选择
@@ -188,16 +187,16 @@ rule-providers:
   direct_list: {!!merge <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/master/Direct.list"}
   proxylite: {!!merge <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/master/ProxyLite.list"}
   ai: {!!merge <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/master/AI.list"}
+  bing_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.mrs"}
+  onedrive_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs"}
+  github_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"}
   youtube_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
   google_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
-  github_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"}
   bahamut_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs"}
   spotify_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs"}
   telegram_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"}
-  onedrive_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs"}
-  microsoft_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"}
+
   apple_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs"}
-  tiktok_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"}
   gfw_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs"}
   geolocation-!cn: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
   cn_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
