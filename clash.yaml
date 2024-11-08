@@ -172,10 +172,12 @@ rules:
   - RULE-SET,youtube_domain,📹 YouTube
   - RULE-SET,google_domain,🍀 Google
   - RULE-SET,telegram_domain,📲 Telegram
-  - RULE-SET,gfw_domain,🚀 节点选择
-  - RULE-SET,geolocation-!cn,🚀 节点选择
+
   - RULE-SET,google_ip,🍀 Google,no-resolve
   - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+  
+  - RULE-SET,gfw_domain,🚀 节点选择
+  - RULE-SET,geolocation-!cn,🚀 节点选择
   - MATCH,🐟 漏网之鱼
 rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
