@@ -140,7 +140,7 @@ proxy-groups:
   - {name: Bahamut, type: select, proxies: [台湾自动, 手动选择]}
   - {name: Spotify, !!merge <<: *pr}
   - {name: Telegram, !!merge <<: *pr}
-  - {name: Missed, !!merge <<: *pr}
+  - {name: FINAL, !!merge <<: *pr}
 
   # - {name: 香港节点, type: select, include-all: true, filter: "(?i)港|hk|hongkong|hong kong"}
   # - {name: 台湾节点, type: select, include-all: true, filter: "(?i)台|TW|Taiwan|tai wan"}
@@ -266,5 +266,5 @@ rules:
   - RULE-SET, geolocation-!cn, 节点选择
 
   # 漏网之鱼
-  - MATCH, Missed
+  - MATCH, FINAL
 
