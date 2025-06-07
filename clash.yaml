@@ -206,7 +206,6 @@ rule-providers:
   cn_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
   cn_ip: {!!merge <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
   direct_list: {!!merge <<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.list"}
-  proxylite: {!!merge <<: *class, url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt"}
   gfw_domain: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs"}
   geolocation-!cn: {!!merge <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
   
@@ -258,7 +257,6 @@ rules:
   - RULE-SET, direct_list, DIRECT
   - RULE-SET, cn_domain, DIRECT
   - RULE-SET, cn_ip, DIRECT
-  - RULE-SET, proxylite, 节点选择
   - RULE-SET, gfw_domain, 节点选择
   - RULE-SET, geolocation-!cn, 节点选择
 
