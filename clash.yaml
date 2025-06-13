@@ -125,13 +125,21 @@ proxies:
   - name: 落地节点_1
     type: socks5
     server: ip    # 请替换为实际IP地址
-    port: port    # 请替换为实际端口
+    port: 1024    # 请替换为实际端口
     username: username    # 请替换为实际用户名
     password: password    # 请替换为实际密码
     tls: false
     skip-cert-verify: true
     udp: true
     dialer-proxy: 链式代理前置    # 配置前置节点策略组
+  
+  # - name: 落地节点_2
+  #   server: 
+  #   port: 8080
+  #   type: ss
+  #   cipher: aes-256-gcm
+  #   password: 
+  #   dialer-proxy: 链式代理前置
 
  
 # 锚点
