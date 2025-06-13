@@ -60,12 +60,12 @@ sniffer:
   enable: true
   sniff:
     HTTP:
-      ports: [80, 8080-8880]
+      ports: [ 80, 8080-8880 ]
       override-destination: true
     TLS:
-      ports: [443, 8443]
+      ports: [ 443, 8443 ]
     QUIC:
-      ports: [443, 8443]
+      ports: [ 443, 8443 ]
   force-domain:
     - +.v2ex.com
   skip-domain:
@@ -119,106 +119,128 @@ dns:
     - 223.5.5.5
     - 119.29.29.29
 
+
+# 落地节点配置
+proxies:
+  - name: 落地节点_1
+    type: socks5
+    server: ip    # 请替换为实际IP地址
+    port: port    # 请替换为实际端口
+    username: username    # 请替换为实际用户名
+    password: password    # 请替换为实际密码
+    tls: false
+    skip-cert-verify: true
+    udp: true
+    dialer-proxy: 链式代理前置    # 配置前置节点策略组
+
  
 # 锚点
-pr: &pr {type: select, proxies: [节点选择, 香港自动, 日本自动, 台湾自动, 新加坡自动, 美国自动, 手动选择, 自动选择, DIRECT]}
+pr: &pr { type: select, proxies: [ 节点选择, 链式代理落地, 香港自动, 日本自动, 台湾自动, 新加坡自动, 美国自动, 手动选择, 自动选择, DIRECT ] }
+
 # 策略组
 proxy-groups:
-  - {name: 节点选择, type: select, proxies: [香港自动, 日本自动, 台湾自动, 新加坡自动, 美国自动, 手动选择, 自动选择, DIRECT]}
-  - {name: 手动选择, type: select, include-all: true}
+  - { name: 节点选择, type: select, proxies: [ 链式代理落地, 香港自动, 日本自动, 台湾自动, 新加坡自动, 美国自动, 手动选择, 自动选择, DIRECT ] }
+
+  # 链式代理前置配置, proxies放机场节点或者策略组, 在使用落地节点的时候会先调用此策略组选择的节点做为前置
+  - { name: 链式代理前置, type: select, proxies: [ 香港自动, 日本自动, 新加坡自动, 美国自动 ] }
+
+  # 链式代理落地配置, proxies放落地节点, 这个策略组要用于其他策略组选择, 是实际要用的策略组
+  - { name: 链式代理落地, type: select, proxies: [ 落地节点_1 ] }
+
+  - { name: 手动选择, type: select, include-all: true }
+  - { name: AI, type: select, proxies: [ 链式代理落地, 日本自动, 新加坡自动, 美国自动, 手动选择 ] }
+  - { name: Google, type: select, !!merge <<: *pr }
+  - { name: YouTube, type: select, !!merge <<: *pr }
+  - { name: GitHub, type: select, !!merge <<: *pr }
+  - { name: Telegram, type: select, !!merge <<: *pr }
+  - { name: Games, type: select, !!merge <<: *pr }
+  - { name: Stream, type: select, !!merge <<: *pr }
   
-  - {name: AI, type: select, proxies: [日本自动, 新加坡自动, 美国自动, 手动选择, DIRECT]}
-  - {name: Google, !!merge <<: *pr}
-  - {name: YouTube, !!merge <<: *pr}
-  - {name: GitHub, !!merge <<: *pr}
-  - {name: Games, type: select, !!merge <<: *pr}
-  - {name: Stream, type: select, !!merge <<: *pr}
-  
-  - {name: Apple, type: select, proxies: [DIRECT, 节点选择]}
-  - {name: Bing, type: select, proxies: [DIRECT, 节点选择]}
-  - {name: OneDrive, !!merge <<: *pr}
-  - {name: Bahamut, type: select, proxies: [台湾自动, 手动选择]}
-  - {name: Spotify, !!merge <<: *pr}
-  - {name: Telegram, !!merge <<: *pr}
-  - {name: FINAL, !!merge <<: *pr}
+  - { name: Apple, type: select, proxies: [ DIRECT, 节点选择 ] }
+  - { name: Bing, type: select, proxies: [ DIRECT, 节点选择 ] }
+  - { name: OneDrive, type: select, !!merge <<: *pr }
+  - { name: Bahamut, type: select, proxies: [ 台湾自动, 手动选择 ] }
+  - { name: Spotify, type: select, !!merge <<: *pr }
+
+  - { name: FINAL, type: select, !!merge <<: *pr }
 
   # type: load-balance, strategy: round-robin
-  - {name: 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5}
-  - {name: 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5}
-  - {name: 台湾自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5}
-  - {name: 新加坡自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(新|狮|狮|SG|Singapore))^((?!(港|日|韩|台|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5}
-  - {name: 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5}
-  - {name: 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "^((?!(直连)).)*$", url: "https://www.gstatic.com/generate_204", lazy: false, timeout: 5000,max-failed-times: 5}
-  - {name: 全部节点, type: select, include-all: true}
+  - { name: 香港自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
+  - { name: 日本自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
+  - { name: 台湾自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
+  - { name: 新加坡自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(新|狮|狮|SG|Singapore))^((?!(港|日|韩|台|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
+  - { name: 美国自动, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
+  - { name: 自动选择, type: url-test, include-all: true, tolerance: 20, interval: 900, filter: "^((?!(直连)).)*$", url: "https://www.gstatic.com/generate_204", lazy: false, timeout: 5000,max-failed-times: 5 }
+  - { name: 全部节点, type: select, include-all: true }
 
 
 rule-anchor:
-  # behavior区分: https://clash.wiki/premium/rule-providers.html
+  # behavior: ipcidr/domain/classical, 参考: https://clash.wiki/premium/rule-providers.html
   # format: mrs / yaml / text
-  # https://bk.zbbp.net/index.php/archives/156/
-  ip-mrs: &ip-mrs {type: http, interval: 86400, behavior: ipcidr, format: mrs}
-  domain-mrs: &domain-mrs {type: http, interval: 86400, behavior: domain, format: mrs}
+  # mrs规则说明: https://bk.zbbp.net/index.php/archives/156/
+  ip-mrs: &ip-mrs { type: http, interval: 86400, behavior: ipcidr, format: mrs }
+  domain-mrs: &domain-mrs { type: http, interval: 86400, behavior: domain, format: mrs }
 
-  domain-yaml: &domain-yaml {type: http, interval: 86400, behavior: domain, format: yaml}
-  domain-text: &domain-text {type: http, interval: 86400, behavior: domain, format: text}
+  domain-yaml: &domain-yaml { type: http, interval: 86400, behavior: domain, format: yaml }
+  domain-text: &domain-text { type: http, interval: 86400, behavior: domain, format: text }
 
-  classical-yaml: &classical-yaml {type: http, interval: 86400, behavior: classical, format: yaml}
-  classical-text: &classical-text {type: http, interval: 86400, behavior: classical, format: text}
+  classical-yaml: &classical-yaml { type: http, interval: 86400, behavior: classical, format: yaml }
+  classical-text: &classical-text { type: http, interval: 86400, behavior: classical, format: text }
 
 
 rule-providers: 
   # reject
-  awavenue_domain: { <<: *domain-mrs, url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs}
+  awavenue_domain: { <<: *domain-mrs, url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs }
   
   # AI
-  ai: {!!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/ai.mrs"}
-  openai: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"}
-  gemini: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-gemini.mrs"}
-  claude: {!!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Claude/Claude.list"}
+  ai: { !!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/ai.mrs" }
+  openai: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs" }
+  gemini: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-gemini.mrs" }
+  claude: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Claude/Claude.list" }
   
   # IDE
-  cursor: {!!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/cursor.list"}
-  windsurf: {!!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/windsurf.list"}
-  augment: {!!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/augment.list"}
+  cursor: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/cursor.list" }
+  windsurf: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/windsurf.list" }
+  augment: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/augment.list" }
 
   # 服务
-  google_ip: {!!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"}
-  google_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
-  youtube_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
+  google_ip: { !!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs" }
+  google_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs" }
+  youtube_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs" }
   
-  apple_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs"}
-  bing_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.mrs"}
-  onedrive_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs"}
-  github_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"}
-  bahamut_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs"}
-  spotify_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs"}
-  telegram_ip: {!!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"}
-  telegram_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"}
-  cloudflare_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cloudflare.mrs"}
-  tiktok_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"}
+  apple_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs" }
+  bing_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.mrs" }
+  onedrive_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs" }
+  github_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs" }
+  bahamut_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs" }
+  spotify_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs" }
+  telegram_ip: { !!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs" }
+  telegram_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs" }
+  cloudflare_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cloudflare.mrs" }
+  tiktok_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs" }
   
   # 游戏
-  steam_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs"}
-  steamcn_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs"}
-  epic_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/epicgames.mrs"}
-  games_cn: {!!merge <<: *domain-mrs, url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/games-cn.mrs"}
-  games: {!!merge <<: *domain-mrs, url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/games.mrs"}
+  steam_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs" }
+  steamcn_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs" }
+  epic_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/epicgames.mrs" }
+  games_cn: { !!merge <<: *domain-mrs, url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/games-cn.mrs" }
+  games: { !!merge <<: *domain-mrs, url: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-ruleset/games.mrs" }
 
   # Stream
-  netflix_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
-  disney_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.mrs"}
-  hbo_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/hbo.mrs"}
-  hulu_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/hulu.mrs"}
+  netflix_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs" }
+  disney_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.mrs" }
+  hbo_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/hbo.mrs" }
+  hulu_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/hulu.mrs" }
 
   # GEO Rules
-  cn_ip: {!!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
-  cn_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
-  private_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"}
-  direct_list: {!!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.list"}
+  cn_ip: { !!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs" }
+  cn_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs" }
+  private_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs" }
+  direct_list: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.list" }
 
-  gfw_domain: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs"}
-  geolocation-!cn: {!!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
-  proxy_list: {!!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Proxy/Proxy.list"}
+  gfw_domain: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/gfw.mrs" }
+  geolocation-!cn: { !!merge <<: *domain-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs" }
+  proxy_list: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Proxy/Proxy.list" }
   
 rules:
   # Reject
@@ -228,7 +250,7 @@ rules:
   - RULE-SET, ai, AI
   - RULE-SET, openai, AI
   - RULE-SET, gemini, AI
-  - RULE-SET, claude, 美国自动
+  - RULE-SET, claude, AI
 
   # IDE
   - RULE-SET, cursor, AI
@@ -273,6 +295,6 @@ rules:
   - RULE-SET, geolocation-!cn, 节点选择
   - RULE-SET, proxy_list, 节点选择
 
-  # 漏网之鱼
+  # 兜底分流
   - MATCH, FINAL
 
