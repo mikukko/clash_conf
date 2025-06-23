@@ -123,7 +123,7 @@ dns:
 # 落地节点配置
 proxies:
   - name: 落地节点_1
-    type: socks5
+    type: http  # 请替换为实际协议类型
     server: ip    # 请替换为实际IP地址
     port: 65535    # 请替换为实际端口
     username: username    # 请替换为实际用户名
