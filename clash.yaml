@@ -175,7 +175,7 @@ proxy-groups:
   # type: load-balance, strategy: round-robin / consistent-hashing / sticky-sessions
   # type: url-test
   - { name: 香港自动, type: load-balance, strategy: consistent-hashing, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(港|HK|(?i)Hong))^((?!(台|日|韩|新|深|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
-  - { name: 日本自动, type: load-balance, strategy: consistent-hashing, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
+  - { name: 日本自动, type: load-balance, strategy: consistent-hashing, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(日|JP|(?i)Japan))^((?!(港|台|韩|新|美|尼)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
   - { name: 台湾自动, type: load-balance, strategy: consistent-hashing, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(台|TW|(?i)Taiwan))^((?!(港|日|韩|新|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
   - { name: 新加坡自动, type: load-balance, strategy: consistent-hashing, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(新|狮|狮|SG|Singapore))^((?!(港|日|韩|台|美)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
   - { name: 美国自动, type: load-balance, strategy: consistent-hashing, include-all: true, tolerance: 20, interval: 900, filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$", url: "https://www.gstatic.com/generate_204", lazy: true, timeout: 5000, max-failed-times: 5 }
