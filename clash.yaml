@@ -208,9 +208,9 @@ rule-providers:
   claude: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Claude/Claude.list" }
   
   # IDE
-  cursor: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/cursor.list" }
-  windsurf: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/windsurf.list" }
-  augment: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/clash_conf/master/filter/augment.list" }
+  cursor: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/rules/master/cursor.list" }
+  windsurf: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/rules/master/windsurf.list" }
+  augment: { !!merge <<: *classical-text, url: "https://raw.githubusercontent.com/mikukko/rules/master/augment.list" }
 
   # 服务
   google_ip: { !!merge <<: *ip-mrs, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs" }
